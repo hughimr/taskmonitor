@@ -1,5 +1,5 @@
 #!/bin/bash
-source LogTool.sh
+source ./LogTool.sh
 
 runInput=$1
 rerunTimes=$2
@@ -27,7 +27,6 @@ _do_ex(){
             sendmail_kdb -s "脚本运行出错告警" -t "$mailTo" -f "$mail_log" -a "$error_log";
             rm $error_log $mail_log;
             [[ $times > $rerunTimes ]] ;}||{
-            sleep 1200;
             echo "exec failed: $1";
             ((times++));
         _do_ex "$task" ;}
@@ -41,4 +40,4 @@ LogTool "用户主程序成功执行完毕！cheers！"
 else
 LogTool "用户主程序执行过程中有错误，错误原因请查看邮箱 $mailTo "
 fi
-rm $error_log || echo "ok"
+rm $error_log ||echo "ok"

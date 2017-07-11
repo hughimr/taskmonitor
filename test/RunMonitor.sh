@@ -1,5 +1,5 @@
 #!/bin/bash
-source LogTool.sh
+source ./LogTool.sh
 #set -x 
 #用法
 USAGE(){
@@ -63,7 +63,7 @@ then
 while read -r line
 do 
     [[ -z $line ]] && continue 
-    TestEachCondition.sh $line || { 
+    sh ./TestEachCondition.sh $line || {
         echo "依赖源数据检查不通过：失败条件为 $line" ;
         LogTool "依赖源数据检查不通过！不通过的条件为 $line" ;
         echo "${scriptDir}###${execScript}###${scriptArgs}###${sourceDataCheck}###${rerunTimes}###${resultCheck}###${alertMailSendTo}">/disk1/stat/user/liwu/qa/taskmonitor/sourcefail/task$RANDOM.`date +"%F_%T"`
@@ -76,7 +76,7 @@ cd $scriptDir
 ##执行脚本函数
 #执行失败就发告警邮件
 LogTool "开始执行RunMain.sh程序"
-RunMain.sh "${scriptDir%/}/$execScript ${scriptArgs}" "$rerunTimes" "$alertMailSendTo"
+sh ./RunMain.sh "${scriptDir%/}/$execScript ${scriptArgs}" "$rerunTimes" "$alertMailSendTo"
 if [ $? -eq 0 ]
 then LogTool "RunMain.sh 无错误执行完毕！用户主程序 $execScript 监控执行完毕！"
 else LogTool "RunMain.sh 未成功执行！一般能的。考虑是不是机器死掉了。"
@@ -90,7 +90,7 @@ then
 while read -r line
 do 
     [[ -z $line ]] && continue 
-    sh -x TestEachCondition.sh "$line" || { 
+    sh -x ./TestEachCondition.sh "$line" || {
         echo "出错脚本程序为：${scriptDir%/}/$execScript ${scriptArgs}">$mail_log;
         echo "错误信息为：">>$mail_log
         echo "执行结果检查不通过：失败条件为 $line" >>$mail_log;

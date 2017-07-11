@@ -4,5 +4,9 @@
     <file url="file://$PROJECT_DIR$/script/RemoveTodayRemainTasks.sh" charset="GB18030" />
     <file url="file://$PROJECT_DIR$/script/RunMain.sh" charset="GB18030" />
     <file url="file://$PROJECT_DIR$/script/RunMonitor.sh" charset="GB18030" />
+    <file url="file://$PROJECT_DIR$/test/LogTool.sh" charset="GB18030" />
+    <file url="file://$PROJECT_DIR$/test/RunMain.sh" charset="GB18030" />
+    <file url="file://$PROJECT_DIR$/test/RunMonitor.sh" charset="GB18030" />
+    <file url="file://$PROJECT_DIR$/test/TestEachCondition.sh" charset="GB18030" />
   </component>
 </project>
