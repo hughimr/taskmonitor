@@ -1,0 +1,20 @@
+1.把/disk1/stat/user/liwu/qa/taskmonitor/bin 主目录加入环境变量中（首次部署的时候做）
+
+2.把/disk1/stat/user/liwu/qa/taskmonitor/bin全部备份到/disk1/stat/user/liwu/qa/taskmonitor/script中
+
+cp /disk1/stat/user/liwu/qa/taskmonitor/bin/* /disk1/stat/user/liwu/qa/taskmonitor/script
+
+3.把本地script目录下的所有脚本文件上传到机器/disk1/stat/user/liwu/qa/taskmonitor/toUp目录中
+
+cd /disk1/stat/user/liwu/qa/taskmonitor/toUp
+rm ./*
+rz
+chmod a+x ./*.sh
+
+4.拷贝/disk1/stat/user/liwu/qa/taskmonitor/toUp 中文件到bin目录中
+
+cd /disk1/stat/user/liwu/qa/taskmonitor/bin
+cp /disk1/stat/user/liwu/qa/taskmonitor/toUp/*.sh ./
+
+
+注意：换行符要是linux 的换行符LF

@@ -1,5 +1,5 @@
 #!/bin/bash
-source LogTool.sh
+source /disk1/stat/user/liwu/qa/taskmonitor/bin/LogTool.sh
 
 runInput=$1
 rerunTimes=$2

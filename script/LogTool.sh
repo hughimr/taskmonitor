@@ -1,5 +1,5 @@
 #!/bin/bash
-#è°ƒç”¨æ–¹å¼ï¼šLogTool.sh
+#µ÷ÓÃ·½Ê½£ºLogTool.sh
 
 _curTime='date +"%F %T"'
 if [ ! -e taskmonitor.log ]
@@ -7,6 +7,6 @@ then touch taskmonitor.log
 fi
 
 LogTool(){
-    echo "$(eval ${_curTime}) [ å½“å‰æ–‡ä»¶ï¼š$(basename $0) ] $*" >>taskmonitor.log
+    echo "$(eval ${_curTime}) [ µ±Ç°ÎÄ¼þ£º$0 ] $*" >>taskmonitor.log
 
 }

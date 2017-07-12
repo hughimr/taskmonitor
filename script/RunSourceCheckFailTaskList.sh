@@ -1,7 +1,7 @@
 #!/bin/bash
 #从3点开始每隔30分钟运行 0,30 2-23 * * * 
 #从/disk1/stat/user/liwu/qa/taskmonitor/sourcefail读任务来执行
-source LogTool.sh
+source /disk1/stat/user/liwu/qa/taskmonitor/bin/LogTool.sh
 toDoList=( `ls -t -r /disk1/stat/user/liwu/qa/taskmonitor/sourcefail` )
 
 #循环处理
