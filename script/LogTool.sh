@@ -7,6 +7,6 @@ then touch taskmonitor.log
 fi
 
 LogTool(){
-    echo "$(eval $_curTime) [ 当前文件：$(basename $0) ] $*" >>taskmonitor.log
+    echo "$(eval ${_curTime}) [ 当前文件：$(basename $0) ] $*" >>taskmonitor.log
 
 }
