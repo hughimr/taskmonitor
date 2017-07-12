@@ -1,7 +1,7 @@
 #!/bin/bash
 #从3点开始每隔30分钟运行 0,30 2-23 * * * 
 #从/disk1/stat/user/liwu/qa/taskmonitor/sourcefail读任务来执行
-source LogTool.sh
+source ./LogTool.sh
 toDoList=( `ls -t -r /disk1/stat/user/liwu/qa/taskmonitor/sourcefail` )
 
 #循环处理
@@ -25,7 +25,7 @@ do
     while read -r line
     do 
         [[ -z ${line} ]] && continue
-        TestEachCondition.sh ${line} || {
+        sh ./TestEachCondition.sh ${line} || {
             echo "依赖源数据检查不通过：失败条件为 ${line} " ;
             LogTool "依赖源数据检查不通过：不通过条件为 ${line} ";
             echo "${scriptDir}###${execScript}###${scriptArgs}###${sourceDataCheck}###${rerunTimes}###${resultCheck}###${mailTo}">/disk1/stat/user/liwu/qa/taskmonitor/sourcefail/task$RANDOM.`date +"%F_%T"`
@@ -33,6 +33,6 @@ do
     done<${sourceDataCheck}
     fi
     LogTool "源数据检查通过，开始进入RunSourceMain.sh程序"
-    nohup sh RunSourceMain.sh "${scriptDir%/}/$execScript ${scriptArgs}" "$rerunTimes" "$resultCheck" "$mailTo" &
+    nohup sh ./RunSourceMain.sh "${scriptDir%/}/$execScript ${scriptArgs}" "$rerunTimes" "$resultCheck" "$mailTo" &
 done
 
