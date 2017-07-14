@@ -7,6 +7,7 @@
 #--file
 #--run
 #condition的形式为hive##gzkdb.kdb_order_buy_detail##ds='``date +%F -d "-1 day"'
+
 condition=${@//\\/\\\\}
 condition=${condition//\|/\\\|}
 condition=${condition//\'/\\\'}
@@ -94,8 +95,12 @@ case ${source} in
         column_number=$(eval echo ${condition}|awk -F '##' '{print $5}')
         if [ ! -e ${file_name} ];then
         exit 1
-        fi 
-        result=`awk -F "[$sep]" -v rn=${row_number} -v cn=${column_number} 'NR==rn{print $cn}' ${file_name}`
+        fi
+        if [ -z "${sep}" ];then
+        result=`awk  -v rn=${row_number} -v cn=${column_number} 'NR==rn{print $cn}' ${file_name}`
+        else
+        result=`awk -F "[${sep}]" -v rn=${row_number} -v cn=${column_number} 'NR==rn{print $cn}' ${file_name}`
+        fi
         if [ -n "$result" ];then 
             exit 0
         else 
