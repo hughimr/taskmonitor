@@ -22,7 +22,7 @@ do
     cd ${scriptDir}
     if [[ ${sourceDataCheck} != "" ]]
     then
-    while read -r line
+    cat ${sourceDataCheck}|while read -r line
     do 
         [[ -z ${line} ]] && continue
         TestEachCondition.sh ${line} || {
@@ -30,9 +30,12 @@ do
             LogTool "依赖源数据检查不通过：不通过条件为 ${line} ";
             echo "${scriptDir}###${execScript}###${scriptArgs}###${sourceDataCheck}###${rerunTimes}###${resultCheck}###${mailTo}">/disk1/stat/user/liwu/qa/taskmonitor/sourcefail/task$RANDOM.`date +"%F_%T"`
                 exit 1; }
-    done<${sourceDataCheck}
+    done
     fi
+    if [ $? -eq 0 ]
+    then
     LogTool "源数据检查通过，开始进入RunSourceMain.sh程序"
     nohup sh RunSourceMain.sh "${scriptDir%/}/$execScript ${scriptArgs}" "$rerunTimes" "$resultCheck" "$mailTo" &
+    fi
 done
 
