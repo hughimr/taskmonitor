@@ -1,4 +1,6 @@
 1.把/disk1/stat/user/liwu/qa/taskmonitor/bin 主目录加入环境变量中（首次部署的时候做）
+LW_TASKMONITOR_HOME=/disk1/stat/user/liwu/qa/taskmonitor/bin
+export PATH=$PATH:$LW_TASKMONITOR_HOME
 
 2.把/disk1/stat/user/liwu/qa/taskmonitor/bin全部备份到/disk1/stat/user/liwu/qa/taskmonitor/script中
 
