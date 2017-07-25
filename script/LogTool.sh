@@ -2,11 +2,12 @@
 #调用方式：LogTool.sh
 
 _curTime='date +"%F %T"'
-if [ ! -e taskmonitor.log ]
-then touch taskmonitor.log
-fi
+
 
 LogTool(){
+    if [ ! -e taskmonitor.log  -a `pwd` != $HOME ]
+    then touch taskmonitor.log
+    fi
     echo "$(eval ${_curTime}) [ 当前文件：$0 ] $*" >>taskmonitor.log
 
 }
