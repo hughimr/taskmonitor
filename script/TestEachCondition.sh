@@ -13,6 +13,8 @@ condition=${condition//\|/\\\|}
 condition=${condition//\'/\\\'}
 condition=${condition//\</\\\<}
 condition=${condition//\>/\\\>}
+condition=${condition//\(/\\\(}
+condition=${condition//\)/\\\)}
 source=$(eval echo ${condition}|awk -F '##' '{print $1}')
 
 case ${source} in
