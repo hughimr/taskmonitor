@@ -66,7 +66,7 @@ for _i in ${pids[*]};do
 #查找crond任务中是否有该任务正在执行，要加上args 条件，才能一次运行比如好几天的数据
 taskIsExist=($(pstree -apl ${_i} | grep "${scriptDir}" |grep "${execScript}" |grep "${argsM}"))
 
-if [ -n "${taskIsExist}" ];then
+if [ -n "${taskIsExist[*]}" ];then
     echo "该脚本正在后台执行！请先Kill掉！"
     echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
     echo "后台任务详情：${taskIsExist[*]}">>my_temp
@@ -81,7 +81,7 @@ done
 
 ##查看sourcefail目录下是否有待手动执行的任务在等待，如果有就删掉
 taskFiles=($(grep -l "${scriptDir}###${execScript}###${scriptArgs}" /disk1/stat/user/liwu/qa/taskmonitor/sourcefail/* ))
-if [ -n "${taskFiles}" ];then
+if [ -n "${taskFiles[*]}" ];then
 #删掉sourcefail目录下找到的任务，用“文件夹###文件名###参数”匹配
 echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
 echo "执行任务过程删掉的任务为：$(cat ${taskFiles[*]})">>my_temp
