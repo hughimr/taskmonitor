@@ -64,7 +64,7 @@ pids=$(pstree -ap |grep "[|]-crond"|cut -d ',' -f 2)
 argsM=$(echo ${scriptArgs})
 for _i in ${pids[*]};do
 #查找crond任务中是否有该任务正在执行，要加上args 条件，才能一次运行比如好几天的数据
-taskIsExist=($(pstree -apl ${_i} | grep ${scriptDir} |grep ${execScript} |grep ${argsM}))
+taskIsExist=($(pstree -apl ${_i} | grep "${scriptDir}" |grep "${execScript}" |grep "${argsM}"))
 
 if [ -n "${taskIsExist}" ];then
     echo "该脚本正在后台执行！请先Kill掉！"
