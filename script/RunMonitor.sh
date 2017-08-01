@@ -68,7 +68,11 @@ taskIsExist=($(pstree -apl ${_i} | grep ${scriptDir} |grep ${execScript} |grep $
 
 if [ -n "${taskIsExist}" ];then
     echo "该脚本正在后台执行！请先Kill掉！"
-    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}"
+    echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
+    echo "后台任务详情：${taskIsExist[*]}">>my_temp
+    echo "任务已退出，请检查原因后手动执行！">>my_temp
+    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}" -f "`pwd`/my_temp"
+    rm my_temp
     echo "后台任务详情：${taskIsExist[*]}"
     exit 1
     fi
@@ -79,6 +83,11 @@ done
 taskFiles=($(grep -l "${scriptDir}###${execScript}###${scriptArgs}" /disk1/stat/user/liwu/qa/taskmonitor/sourcefail/* ))
 if [ -n "${taskFiles}" ];then
 #删掉sourcefail目录下找到的任务，用“文件夹###文件名###参数”匹配
+echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
+echo "执行任务过程删掉的任务为：$(cat ${taskFiles[*]})">>my_temp
+echo "请确认删掉的任务是无用的！">>my_temp
+sendmail_kdb -s "监控告警：RunMonitor在运行时删掉了任务！" -t "${alertMailSendTo}" -f "`pwd`/my_temp"
+rm my_temp
 echo "重跑任务过程删掉的任务为：$(cat ${taskFiles[*]})"
 LogTool "重跑任务过程删掉的任务为：$(cat ${taskFiles[*]})"
 rm ${taskFiles[*]}
