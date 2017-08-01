@@ -68,6 +68,7 @@ taskIsExist=($(pstree -apl ${_i} | grep ${scriptDir} |grep ${execScript} |grep $
 
 if [ -n "${taskIsExist}" ];then
     echo "该脚本正在后台执行！请先Kill掉！"
+    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}"
     echo "后台任务详情：${taskIsExist[*]}"
     exit 1
     fi
