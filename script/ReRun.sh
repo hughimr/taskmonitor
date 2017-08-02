@@ -1,6 +1,6 @@
 #!/bin/bash
 source /disk1/stat/user/liwu/qa/taskmonitor/bin/LogTool.sh
-#set -x 
+#set -x
 #用法
 USAGE(){
 echo "Usage : `basename $0` -s \"XXX\" -r \"XXX\" -m \"XXX\" -e \"XXX\" -n XXX -a \"XXX XXX\""
@@ -35,18 +35,18 @@ do
     a) scriptArgs=$OPTARG;;
     \?) USAGE && exit 1;;
     esac
-done 
+done
 
 #------------------------------------------------------------
 ## 判断输入参数
 if [[ $# -eq 0 || ${execScript} = "" || ${alertMailSendTo} = "" ]];
-then 
+then
     echo "至少需要输入 -e -m 参数"
     USAGE
     exit 1
 fi
 
-scriptDir=`pwd` 
+scriptDir=`pwd`
 rerunTimes=${rerunTimes:-1}
 
 if [ ! -e ${scriptDir}/${execScript} ];then
@@ -54,14 +54,57 @@ if [ ! -e ${scriptDir}/${execScript} ];then
     LogTool "配置的任务检查不通过！目录${scriptDir}下不存在文件$execScript"
     exit 1
 fi
+
+##------------针对手动处理-------------
+##查找定时任务中的crond任务
+pids=$(pstree -ap |grep "[|]-crond"|cut -d ',' -f 2)
+
+
+#一个小trick:去掉args中的多余空格，使之与后台形式保持一致
+argsM=$(echo ${scriptArgs})
+for _i in ${pids[*]};do
+#查找crond任务中是否有该任务正在执行，要加上args 条件，才能一次运行比如好几天的数据
+taskIsExist=($(pstree -apl ${_i} | grep "${scriptDir}" |grep "${execScript}" |grep "${argsM}"))
+
+if [ -n "${taskIsExist[*]}" ];then
+    echo "该脚本正在后台执行！请先Kill掉！"
+    echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
+    echo "后台任务详情：${taskIsExist[*]}">>my_temp
+    echo "任务已退出，请检查原因后手动执行！">>my_temp
+    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}" -f "`pwd`/my_temp"
+    rm my_temp
+    echo "后台任务详情：${taskIsExist[*]}"
+    exit 1
+    fi
+
+done
+
+##查看sourcefail目录下是否有待手动执行的任务在等待，如果有就删掉
+taskFiles=($(grep -l "${scriptDir}###${execScript}###${scriptArgs}" /disk1/stat/user/liwu/qa/taskmonitor/sourcefail/* ))
+if [ -n "${taskFiles[*]}" ];then
+#删掉sourcefail目录下找到的任务，用“文件夹###文件名###参数”匹配
+echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
+echo "执行任务过程删掉的任务为：$(cat ${taskFiles[*]})">>my_temp
+echo "请确认删掉的任务是无用的！">>my_temp
+sendmail_kdb -s "监控告警：RunMonitor在运行时删掉了任务！" -t "${alertMailSendTo}" -f "`pwd`/my_temp"
+rm my_temp
+echo "重跑任务过程删掉的任务为：$(cat ${taskFiles[*]})"
+LogTool "重跑任务过程删掉的任务为：$(cat ${taskFiles[*]})"
+rm ${taskFiles[*]}
+fi
+
+##------------以上针对手动处理
+
 LogTool "任务配置格式检查通过！配置的任务为：${scriptDir}###${execScript}###${scriptArgs}###${sourceDataCheck}###${rerunTimes}###${resultCheck}###${alertMailSendTo}"
+
+
 #------------------------------------------------------------
 if [[ ${sourceDataCheck} != "" ]]
-then 
+then
 ##检查任务依赖数据源.如果检查失败就把数据任务写到失败目录下的文件中，待重跑.
 #此处不发告警邮件
 while read -r line
-do 
+do
     [[ -z ${line} ]] && continue
     TestEachCondition.sh ${line} || {
         echo "依赖源数据检查不通过：失败条件为 $line" ;
@@ -88,9 +131,9 @@ mail_log=`pwd`/mail_log.$RANDOM
 if [[ ${resultCheck} != "" ]]
 then
 while read -r line
-do 
+do
     [[ -z ${line} ]] && continue
-    sh -x TestEachCondition.sh "$line" || { 
+    sh -x TestEachCondition.sh "$line" || {
         echo "出错脚本程序为：${scriptDir%/}/$execScript ${scriptArgs}">${mail_log};
         echo "错误信息为：">>${mail_log}
         echo "执行结果检查不通过：失败条件为 $line" >>${mail_log};
