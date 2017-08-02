@@ -65,14 +65,14 @@ argsM=$(echo ${scriptArgs})
 for _i in ${pids[*]};do
 #查找crond任务中是否有该任务正在执行，要加上args 条件，才能一次运行比如好几天的数据
 taskIsExist=($(pstree -apl ${_i} | grep "${scriptDir}" |grep "${execScript}" |grep "${argsM}"))
-
+my_temp="my_temp.$RANDOM"
 if [ -n "${taskIsExist[*]}" ];then
     echo "该脚本正在后台执行！请先Kill掉！"
-    echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
-    echo "后台任务详情：${taskIsExist[*]}">>my_temp
-    echo "任务已退出，请检查原因后手动执行！">>my_temp
-    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}" -f "`pwd`/my_temp"
-    rm my_temp
+    echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">${my_temp}
+    echo "后台任务详情：${taskIsExist[*]}">>${my_temp}
+    echo "任务已退出，请检查原因后手动执行！">>${my_temp}
+    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}" -f "`pwd`/${my_temp}"
+    rm ${my_temp}
     echo "后台任务详情：${taskIsExist[*]}"
     exit 1
     fi
