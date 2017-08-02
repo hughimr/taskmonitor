@@ -56,31 +56,32 @@ if [ ! -e ${scriptDir}/${execScript} ];then
 fi
 
 ##------------针对手动处理-------------
-##查找定时任务中的crond任务
-pids=$(pstree -ap |grep "[|]-crond"|cut -d ',' -f 2)
+###查找定时任务中的crond任务;因为不好剔除当前进程，所以去掉。
+#pids=$(pstree -ap |grep "[|]-crond"|cut -d ',' -f 2)
+#
+#
+##一个小trick:去掉args中的多余空格，使之与后台形式保持一致
+#argsM=$(echo ${scriptArgs})
+#for _i in ${pids[*]};do
+##查找crond任务中是否有该任务正在执行，要加上args 条件，才能一次运行比如好几天的数据
+#taskIsExist=($(pstree -apl ${_i} | grep "${scriptDir}" |grep "${execScript}" |grep "${argsM}"))
+#my_temp="my_temp.$RANDOM"
+#if [ -n "${taskIsExist[*]}" ];then
+#    echo "该脚本正在后台执行！请先Kill掉！"
+#    echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">${my_temp}
+#    echo "后台任务详情：${taskIsExist[*]}">>${my_temp}
+#    echo "任务已退出，请检查原因后手动执行！">>${my_temp}
+#    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}" -f "`pwd`/${my_temp}"
+#    rm ${my_temp}
+#    echo "后台任务详情：${taskIsExist[*]}"
+#    exit 1
+#    fi
+#
+#done
 
+##查看sourcefail和resultfail目录下是否有待手动执行的任务在等待，如果有就删掉
+taskFiles=($(grep -l "${scriptDir}###${execScript}###${scriptArgs}" /disk1/stat/user/liwu/qa/taskmonitor/{sourcefail,resultfail}/* ))
 
-#一个小trick:去掉args中的多余空格，使之与后台形式保持一致
-argsM=$(echo ${scriptArgs})
-for _i in ${pids[*]};do
-#查找crond任务中是否有该任务正在执行，要加上args 条件，才能一次运行比如好几天的数据
-taskIsExist=($(pstree -apl ${_i} | grep "${scriptDir}" |grep "${execScript}" |grep "${argsM}"))
-my_temp="my_temp.$RANDOM"
-if [ -n "${taskIsExist[*]}" ];then
-    echo "该脚本正在后台执行！请先Kill掉！"
-    echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">${my_temp}
-    echo "后台任务详情：${taskIsExist[*]}">>${my_temp}
-    echo "任务已退出，请检查原因后手动执行！">>${my_temp}
-    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}" -f "`pwd`/${my_temp}"
-    rm ${my_temp}
-    echo "后台任务详情：${taskIsExist[*]}"
-    exit 1
-    fi
-
-done
-
-##查看sourcefail目录下是否有待手动执行的任务在等待，如果有就删掉
-taskFiles=($(grep -l "${scriptDir}###${execScript}###${scriptArgs}" /disk1/stat/user/liwu/qa/taskmonitor/sourcefail/* ))
 if [ -n "${taskFiles[*]}" ];then
 #删掉sourcefail目录下找到的任务，用“文件夹###文件名###参数”匹配
 echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
@@ -92,7 +93,6 @@ echo "重跑任务过程删掉的任务为：$(cat ${taskFiles[*]})"
 LogTool "重跑任务过程删掉的任务为：$(cat ${taskFiles[*]})"
 rm ${taskFiles[*]}
 fi
-
 ##------------以上针对手动处理
 
 LogTool "任务配置格式检查通过！配置的任务为：${scriptDir}###${execScript}###${scriptArgs}###${sourceDataCheck}###${rerunTimes}###${resultCheck}###${alertMailSendTo}"
