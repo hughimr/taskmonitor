@@ -9,5 +9,5 @@ mv  /disk1/stat/user/liwu/qa/taskmonitor/sourcefail/* /disk1/stat/user/liwu/qa/t
 echo "已将相关任务移到目录/disk1/stat/user/liwu/qa/taskmonitor/log/`date +%F`下">>/disk1/stat/user/liwu/qa/taskmonitor/log/remainTaskForMail.txt
 
 
-sendmail_kdb -s "`date +%F`检测到未执行完的任务" -f "/disk1/stat/user/liwu/qa/taskmonitor/log/remainTaskForMail.txt" -t "gzliwu@91tianchen.com" 
+sendmail_monitor -s "`date +%F`检测到未执行完的任务" -f "/disk1/stat/user/liwu/qa/taskmonitor/log/remainTaskForMail.txt" -t "gzliwu@91tianchen.com"
 fi

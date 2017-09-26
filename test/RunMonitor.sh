@@ -95,7 +95,7 @@ do
         echo "错误信息为：">>${mail_log}
         echo "执行结果检查不通过：失败条件为 $line" >>${mail_log};
         LogTool "执行结果检查不通过！不通过的条件为 $line";
-        sendmail_kdb -s "脚本运行结果检测不通过告警" -t "$alertMailSendTo" -f "$mail_log";
+        sendmail_monitor -s "脚本运行结果检测不通过告警" -t "$alertMailSendTo" -f "$mail_log";
         rm ${mail_log};
         echo "${scriptDir}###${execScript}###${scriptArgs}###${sourceDataCheck}###${rerunTimes}###${resultCheck}###${alertMailSendTo}">/disk1/stat/user/liwu/qa/taskmonitor/resultfail/task$RANDOM.`date +"%F_%T"`
         exit 1; }

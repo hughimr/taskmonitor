@@ -1,0 +1,92 @@
+#!/bin/bash
+
+usage()
+{
+	echo "Usage: `basename $0` [options]";
+	echo "Example：sendmail_monitor -s \"xx日报\" -t \"user@xxx\" -f \"/disk1/file1.txt\"";
+	echo "Options:";
+	echo "其中-s,-t,-f必须指定";
+	echo "-s      标题";
+	echo "-t      收件人或收件人列表,example:\"user@xxxx\" or \"user1@xxx,user2@xxx\"";
+	echo "-f      需要展示到内容的文件列表,绝对路径";
+	echo "-a      附件列表,绝对路径,例如:\"/disk1/stat/user/gzhannah/file.txt\" or \"/disk1/stat/user/gzhannah/file1.txt,/disk1/stat/user/gzhannah/file2.txt\"";
+	echo "-l      编码语言,默认为gb2312";
+	echo "-w      显示的宽度,例如:100 or 60 or 80";
+	echo "-h      显示帮助";
+	exit 1;
+}
+
+if [ $# == 0 ]; then
+        usage
+fi
+
+subject="test"
+recipients="gzliwu@corp.netease.com"
+filepath="/disk1/stat/user/gzhannah/qa/temp/test.txt"
+attachment="null"
+lang="gb2312"
+width="100"
+limit="100"
+
+while getopts ":s:t:f:a:l:w:h" opt;do
+case $opt in
+s) subject=$OPTARG ;;
+t) recipients=$OPTARG ;;
+f) filepath=$OPTARG ;;
+a) attachment=$OPTARG ;;
+l) lang=$OPTARG ;;
+w) width=$OPTARG ;;
+h) usage;;
+\?) usage ;;
+esac
+done
+
+#读取配置文件参数
+host='mfast.163.internal'
+sender='mail@service.netease.com'
+limit='500'
+
+#检查文件类参数，文件是否存在
+OLD_IFS="$IFS"
+IFS=","
+farr=($filepath)
+IFS="$OLD_IFS"
+for f in ${farr[@]}
+do
+    if [[ ! -f $f ]];then
+        echo "$f文件不存在！";
+        exit 1;
+    fi
+done
+
+if [[ $attachment != "null" ]];then
+    OLD_IFS="$IFS"
+    IFS=","
+    arr=($attachment)
+    IFS="$OLD_IFS"
+    for f in ${arr[@]}
+    do
+        if [[ ! -f $f ]];then
+            echo "$f文件不存在！";
+            exit 1;
+        fi
+    done
+fi
+
+
+#进入程序执行路径
+cd /home/gzstat/sendmail
+
+#发送邮件
+time=0
+while [ 1 ]; do
+    num=`date -d "now" +%s`
+    errfile="err$num"
+    /usr/bin/java -jar /disk1/stat/user/liwu/qa/taskmonitor/bin/javamail.jar $recipients $subject $filepath $host $sender $lang $limit none none $attachment $width 1>>taskmonitor_mail.log 2>$errfile
+    echo -e "`date '+%Y-%m-%d %H:%M:%S'`\tsendmail_3c\t$recipients\t$subject\t$filepath\t$sender\n" >>taskmonitor_mail.log
+    if [[ ! -s $errfile || $((time++)) -gt 3 ]];then
+       rm $errfile
+       break
+    fi
+    sleep 60
+done

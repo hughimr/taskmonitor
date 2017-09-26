@@ -24,7 +24,7 @@ _do_ex(){
             echo "错误信息为：">>$mail_log
             tail -100 $error_log>>$mail_log;
             echo "更详细信息见附件">>$mail_log
-            sendmail_kdb -s "脚本运行出错告警" -t "$mailTo" -f "$mail_log" -a "$error_log";
+            sendmail_monitor -s "脚本运行出错告警" -t "$mailTo" -f "$mail_log" -a "$error_log";
             rm $error_log $mail_log;
             [[ $times > $rerunTimes ]] ;}||{
             echo "exec failed: $1";

@@ -71,7 +71,7 @@ fi
 #    echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">${my_temp}
 #    echo "后台任务详情：${taskIsExist[*]}">>${my_temp}
 #    echo "任务已退出，请检查原因后手动执行！">>${my_temp}
-#    sendmail_kdb -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}" -f "`pwd`/${my_temp}"
+#    sendmail_monitor -s "监控告警：RunMonitor在运行时发现后台有重复任务！" -t "${alertMailSendTo}" -f "`pwd`/${my_temp}"
 #    rm ${my_temp}
 #    echo "后台任务详情：${taskIsExist[*]}"
 #    exit 1
@@ -87,7 +87,7 @@ if [ -n "${taskFiles[*]}" ];then
 echo "RunMonitor要运行的任务为：${scriptDir}###${execScript}###${scriptArgs}">my_temp
 echo "执行任务过程删掉的任务为：$(cat ${taskFiles[*]})">>my_temp
 echo "请确认删掉的任务是无用的！">>my_temp
-sendmail_kdb -s "监控告警：RunMonitor在运行时删掉了任务！" -t "${alertMailSendTo}" -f "`pwd`/my_temp"
+sendmail_monitor -s "监控告警：RunMonitor在运行时删掉了任务！" -t "${alertMailSendTo}" -f "`pwd`/my_temp"
 rm my_temp
 echo "重跑任务过程删掉的任务为：$(cat ${taskFiles[*]})"
 LogTool "重跑任务过程删掉的任务为：$(cat ${taskFiles[*]})"
@@ -138,7 +138,7 @@ do
         echo "错误信息为：">>${mail_log}
         echo "执行结果检查不通过：失败条件为 $line" >>${mail_log};
         LogTool "执行结果检查不通过！不通过的条件为 $line";
-        sendmail_kdb -s "脚本运行结果检测不通过告警" -t "$alertMailSendTo" -f "$mail_log";
+        sendmail_monitor -s "脚本运行结果检测不通过告警" -t "$alertMailSendTo" -f "$mail_log";
         rm ${mail_log};
         echo "${scriptDir}###${execScript}###${scriptArgs}###${sourceDataCheck}###${rerunTimes}###${resultCheck}###${alertMailSendTo}">/disk1/stat/user/liwu/qa/taskmonitor/resultfail/task$RANDOM.`date +"%F_%T"`
         exit 1; }
